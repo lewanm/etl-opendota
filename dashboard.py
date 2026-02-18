@@ -1,0 +1,56 @@
+import streamlit as st
+import pandas as pd
+import mysql.connector
+import plotly.express as px
+
+def get_data():
+    conn = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="N4hUeL!2026_sqlETL#",
+        database="opendota"
+    )
+    query = "SELECT * FROM matches"
+    df = pd.read_sql(query, conn)
+    conn.close()
+    return df
+
+st.set_page_config(page_title="Dota 2 Dashborad", layout="wide")
+
+st.title("Dashboard de OpenDota - ETL")
+
+df = get_data()
+
+st.subheader("Vista general de los datos")
+st.dataframe(df, use_container_width=True)
+
+st.subheader("KDA promedio por heroe")
+
+kda_por_heroe = df.groupby("hero_id")["kda"].mean().reset_index()
+
+fig_kda = px.bar(
+    kda_por_heroe,
+    x="hero_id",
+    y="kda",
+    title="KDA Promedio por heroe",
+    labels={"hero_id": "Hero ID", "kda": "KDA Promedio"},
+    color="kda",
+    color_continuous_scale="Blues"
+)
+
+st.plotly_chart(fig_kda, use_container_width=True)
+
+
+
+st.subheader("Distribucion de duracion de partidas")
+
+fig_duration = px.histogram(
+    df,
+    x="duration_minutes",
+    nbins=20,
+    title="Distribucion de duracion de partidas",
+    labels={"duration_minutes": "Duracion (minutos)"},
+    color_discrete_sequence=["#1f77b4"]
+)
+
+st.plotly_chart(fig_duration, use_container_width=True)
