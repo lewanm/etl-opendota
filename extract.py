@@ -12,3 +12,10 @@ def get_recent_matches(player_id):
 if __name__ == "__main__":
     df = get_recent_matches(PLAYER_ID)
     print(df.head())
+
+from transform import transform_matches
+
+if __name__ == "__main__":
+    df = get_recent_matches(PLAYER_ID)
+    clean_df = transform_matches(df)
+    print(clean_df.head())
