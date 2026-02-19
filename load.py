@@ -1,13 +1,17 @@
 import mysql.connector 
 from mysql.connector import Error
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 def create_connection():
     try:
         connection = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="N4hUeL!2026_sqlETL#",
-            database="opendota"
+            host=os.getenv("MYSQL_HOST"),
+            user=os.getenv("MYSQL_USER"),
+            password=os.getenv("MYSQL_PASSWORD"),
+            database=os.getenv("MYSQL_DATABASE")
         )
         return connection
     except Error as e:

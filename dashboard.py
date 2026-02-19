@@ -2,13 +2,18 @@ import streamlit as st
 import pandas as pd
 import mysql.connector
 import plotly.express as px
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 
 def get_data():
     conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="N4hUeL!2026_sqlETL#",
-        database="opendota"
+        host=os.getenv("MYSQL_HOST"),
+        user=os.getenv("MYSQL_USER"),
+        password=os.getenv("MYSQL_PASSWORD"),
+        database=os.getenv("MYSQL_DATABASE")
     )
     query = "SELECT * FROM matches"
     df = pd.read_sql(query, conn)
@@ -26,19 +31,20 @@ st.dataframe(df, use_container_width=True)
 
 st.subheader("KDA promedio por heroe")
 
-kda_por_heroe = df.groupby("hero_id")["kda"].mean().reset_index()
+kda_por_heroe = df.groupby("hero_id")["kda"].mean().reset_index().sort_values(by="kda", ascending=False)
 
 fig_kda = px.bar(
     kda_por_heroe,
-    x="hero_id",
-    y="kda",
-    title="KDA Promedio por heroe",
+    x="kda",
+    y="hero_id",
+    orientation="h",
+    title="KDA Promedio por heroe (ordenado)",
     labels={"hero_id": "Hero ID", "kda": "KDA Promedio"},
     color="kda",
     color_continuous_scale="Blues"
 )
 
-st.plotly_chart(fig_kda, use_container_width=True)
+st.plotly_chart(fig_kda, width="stretch")
 
 
 
@@ -49,7 +55,7 @@ fig_duration = px.histogram(
     x="duration_minutes",
     nbins=20,
     title="Distribucion de duracion de partidas",
-    labels={"duration_minutes": "Duracion (minutos)"},
+    labels={"duration_minutes": "Duracion (minutos)", "count": "Cantidad de partidas"},
     color_discrete_sequence=["#1f77b4"]
 )
 
