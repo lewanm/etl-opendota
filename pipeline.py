@@ -8,6 +8,12 @@ def run_pipeline(player_id=None):
 
     print("Extrayendo datos desde OpenDota API...")
     df_raw = get_recent_matches(player_id)
+
+    if df_raw.empty:
+        print(f"No hay partidas públicas disponibles para el jugador {player_id}.") 
+        print("El perfil puede estar privado o sin datos recientes.")
+        return
+    
     print("Transformando datos...")
     df_clean = transform_matches(df_raw)
 
